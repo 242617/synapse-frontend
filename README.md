@@ -1,11 +1,19 @@
 # synapse frontent
 
-This is frontend for core service.
-You could (soon):
-* list online crawlers
-* make tasks for them
+Frontend for core service.
 
-# Systemd unit
+# Setup
+
+## Setup user
+
+```
+sudo adduser synapse-frontend
+sudo adduser synapse-frontend docker
+```
+
+## Setup service
+
+Create _/etc/systemd/system/synapse-frontend.service_:
 
 ```
 [Unit]
@@ -15,10 +23,28 @@ After=docker.service
 
 [Service]
 User=synapse-frontend
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=synapse-frontend
 Restart=always
-ExecStart=/usr/bin/docker run --rm -v /etc/letsencrypt/archive/synapse.chill-out.ru/:/etc/letsencrypt/archive/synapse.chill-out.ru/ -v /etc/letsencrypt/live/synapse.chill-out.ru/:/etc/letsencrypt/live/synapse.chill-out.ru/ -p 80:80 -p 443:443 --name frontend 242617/synapse-frontend
-ExecStop=/usr/bin/docker stop frontend
+ExecStart=/usr/bin/docker run --rm -p 8080:80 --name synapse-frontend 242617/synapse-frontend
+ExecStop=/usr/bin/docker stop synapse-frontend
 
 [Install]
 WantedBy=local.target
+```
+
+## Logging
+
+Create _/etc/rsyslog.d/synapse-frontend.conf_:
+
+```
+if $programname == 'synapse-frontend' then /var/log/synapse-frontend.log
+& stop
+```
+
+```
+sudo touch /var/log/synapse-frontend.log
+sudo chown syslog:adm /var/log/synapse-frontend.log
+sudo systemctl restart rsyslog
 ```
