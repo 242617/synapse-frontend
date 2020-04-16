@@ -1,4 +1,9 @@
 
+.PHONY: build
+build:
+	cp www/* build
+
+
 DOCKER_CONTAINER_NAME := synapse-frontend
 DOCKER_IMAGE_NAME := 242617/synapse-frontend
 
